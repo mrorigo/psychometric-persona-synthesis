@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPS | Psychometric Persona Synthesis</title>
+    <meta name="description" content="A research-grounded framework for architecting high-fidelity AI agent personas using the BFI-2 and multivariate sampling.">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --surface-color: #161b22;
+            --surface-hover: #21262d;
+            --primary-accent: #3fb950; /* GH Green */
+            --secondary-accent: #218bff; /* GH Blue */
+            --tertiary-accent: #a371f7; /* GH Purple */
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Background Effects */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(33, 139, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(163, 113, 247, 0.05) 0%, transparent 50%);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        header {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--secondary-accent), var(--tertiary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 0 4rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+        }
+
+        .hero h1 span {
+            display: block;
+            color: var(--text-secondary);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-accent);
+            color: #fff;
+            border: 1px solid var(--primary-accent);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(63, 185, 80, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--surface-hover);
+            border-color: var(--text-secondary);
+        }
+
+        /* Stats/Specs Bar */
+        .specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+            padding: 2rem;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .spec-item .value {
+            display: block;
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--secondary-accent);
+        }
+
+        .spec-item .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Simulator Demo */
+        .demo-section {
+            padding: 6rem 0;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .demo-grid { grid-template-columns: 1fr; }
+        }
+
+        .role-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .role-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .role-card.active {
+            border-color: var(--primary-accent);
+            background: rgba(63, 185, 80, 0.05);
+        }
+
+        .role-card:hover:not(.active) {
+            background: var(--surface-hover);
+        }
+
+        .role-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .role-card span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .persona-output {
+            background: #010409;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            min-height: 400px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .persona-output::before {
+            content: 'SIMULATION OUTPUT';
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary-accent);
+            letter-spacing: 2px;
+        }
+
+        .output-text {
+            color: #d0d7de;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease-out;
+        }
+
+        .output-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Why PPS Section */
+        .features {
+            padding: 6rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-heading);
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .footer-links {
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin: 0 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-accent);
+        }
+
+        .copyright {
+            color: #484f58;
+            font-size: 0.8rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-bg"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo">PPS. ENGINE</div>
+            <nav>
+                <a href="#features">Features</a>
+                <a href="#demo">Simulation</a>
+                <a href="https://github.com/mrorigo/psychometric-persona-synthesis" target="_blank">GitHub</a>
+            </nav>
+        </header>
+
+        <section class="hero animate-in">
+            <h1>Architecture <span>For AI Identities.</span></h1>
+            <p>Generate research-grounded, internally consistent personas using multivariate normal sampling and the BFI-2 psychometric framework.</p>
+            <div class="cta-group">
+                <a href="https://github.com/mrorigo/psychometric-persona-synthesis" class="btn btn-primary">Star on GitHub</a>
+                <a href="#demo" class="btn btn-secondary">Try Simulation</a>
+            </div>
+        </section>
+
+        <div class="specs animate-in" style="animation-delay: 0.2s;">
+            <div class="spec-item">
+                <span class="value">60</span>
+                <span class="label">BFI-2 Facets</span>
+            </div>
+            <div class="spec-item">
+                <span class="value">15+</span>
+                <span class="label">Occupational Roles</span>
+            </div>
+            <div class="spec-item">
+                <span class="value">&Sigma; Matrix</span>
+                <span class="label">Cholesky Sampling</span>
+            </div>
+            <div class="spec-item">
+                <span class="value">3 Persp.</span>
+                <span class="label">Linguistic Engine</span>
+            </div>
+        </div>
+
+        <section id="demo" class="demo-section animate-in" style="animation-delay: 0.4s;">
+            <h2 style="font-family: var(--font-heading); margin-bottom: 2rem; font-size: 2rem;">Interactive Simulation</h2>
+            <div class="demo-grid">
+                <div class="role-selector">
+                    <div class="role-card active" onclick="selectRole('Doctor')">
+                        <h3>Medical Doctor</h3>
+                        <span>Professional High-C Profile</span>
+                    </div>
+                    <div class="role-card" onclick="selectRole('Entrepreneur')">
+                        <h3>Entrepreneur</h3>
+                        <span>High-E Achievement Seeker</span>
+                    </div>
+                    <div class="role-card" onclick="selectRole('Professor')">
+                        <h3>Unversity Professor</h3>
+                        <span>High-O Value Driven Profile</span>
+                    </div>
+                    <div class="role-card" onclick="selectRole('Artist')">
+                        <h3>Creative Artist</h3>
+                        <span>Extreme Openness Profile</span>
+                    </div>
+                </div>
+                <div class="persona-output">
+                    <div id="output" class="output-text">Select a role to generate a synthetic persona...</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features animate-in" style="animation-delay: 0.6s;">
+            <div class="feature-card">
+                <h3>Multivariate Realism</h3>
+                <p>Moves beyond independent trait sampling. PPS respects inter-trait correlations, ensuring your agents don't exhibit "psychological oxymorons."</p>
+            </div>
+            <div class="feature-card">
+                <h3>Meta-Analytic Priors</h3>
+                <p>Grounded in data from SOEP, EVS, and ESS. Profiles are shifted based on real-world occupational and demographic longitudinal research.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Linguistic Flow</h3>
+                <p>Our narrative engine caps trait bundling and uses semantically rigorous adjectival mapping to produce natural, non-repetitive prompts.</p>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-links">
+                <a href="https://github.com/mrorigo/psychometric-persona-synthesis">Source Code</a>
+                <a href="WHITEPAPER.md">Technical Paper</a>
+                <a href="https://arxiv.org/abs/2410.19238">Base Research</a>
+            </div>
+            <p class="copyright">&copy; 2025 Psychometric Persona Synthesis Engine. Research-Grounded AI Ethics.</p>
+        </footer>
+    </div>
+
+    <script>
+        const personas = {
+            'Doctor': `### Role: Medical Doctor ###
+I have attained Tertiary Education (Medical Degree). I strongly value Benevolence, Universalism, and Achievement.
+
+**Personality Traits**
+I'm someone who is very dependable, efficient, and responsible. People generally describe me as not at all disorganized or distractible. I'm fairly sociable and influential but maintain a composed and stable demeanor. I consider myself quite compassionate and sympathetic toward others.`,
+            
+            'Entrepreneur': `### Role: Entrepreneur ###
+I have attained Higher Education. I strongly value Power, Achievement, and Self-Direction.
+
+**Personality Traits**
+I'm extremely assertive, enthusiastic, and dominant in my interactions. I consider myself very energetic and rarely shy. I'm fairly original and inventive, always seeking self-direction. While I focus on high achievement, I remain dependable and persistent in my professional pursuits.`,
+            
+            'Professor': `### Role: University Professor ###
+I have attained Tertiary Education (Doctorate). I strongly value Universalism, Benevolence, and Openness to Change.
+
+**Personality Traits**
+I'm very original, curious, and creative in my thinking. I consider myself fairly complex and inventive. I am not at all conventional or literal-minded. I'm fairly respectful and helpful toward my peers. People generally describe me as calm, relaxed, and secure in my academic environment.`,
+
+            'Artist': `### Role: Creative Artist ###
+I have attained Tertiary Education. I strongly value Self-Direction, Universalism, and Openness to Change.
+
+**Personality Traits**
+I'm extremely original, imaginative, and artistic. I consider myself very creative and unique. I tend to be somewhat moody and temperamental, reflecting my deep focus on aesthetics. People generally describe me as rarely routine-oriented or practical, favoring inventive and unconventional approaches.`
+        };
+
+        function selectRole(role) {
+            // Update UI
+            const cards = document.querySelectorAll('.role-card');
+            cards.forEach(card => {
+                card.classList.remove('active');
+                if (card.querySelector('h3').innerText.includes(role)) {
+                    card.classList.add('active');
+                }
+            });
+
+            // Update Output
+            const output = document.getElementById('output');
+            output.classList.remove('visible');
+            
+            setTimeout(() => {
+                output.innerText = personas[role];
+                output.classList.add('visible');
+            }, 300);
+        }
+
+        // Initialize with first role
+        document.addEventListener('DOMContentLoaded', () => {
+            selectRole('Doctor');
+        });
+    </script>
+</body>
+</html>

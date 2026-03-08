@@ -234,6 +234,51 @@ export const OCCUPATIONAL_ROLES: Record<string, RoleMetadata> = {
             tertiaryProbability: 0.20,
             label: "Secondary Education"
         }
+    },
+    "QA Engineer": {
+        group: "Professional",
+        offsets: {
+            Neuroticism: -0.05,
+            Extraversion: 0.00,
+            Openness: 0.15,
+            Agreeableness: 0.10,
+            Conscientiousness: 0.45
+        },
+        typicalValues: ["Security", "Universalism", "Conformity"],
+        education: {
+            tertiaryProbability: 0.85,
+            label: "Tertiary Education (Bachelors)"
+        }
+    },
+    "DevOps Engineer": {
+        group: "Professional",
+        offsets: {
+            Neuroticism: -0.20,
+            Extraversion: 0.05,
+            Openness: 0.25,
+            Agreeableness: 0.15,
+            Conscientiousness: 0.35
+        },
+        typicalValues: ["Security", "Self-Direction", "Achievement"],
+        education: {
+            tertiaryProbability: 0.80,
+            label: "Tertiary Education (Bachelors)"
+        }
+    },
+    "Chief Financial Officer": {
+        group: "Manager",
+        offsets: {
+            Neuroticism: -0.20,
+            Extraversion: 0.15,
+            Openness: 0.05,
+            Agreeableness: 0.05,
+            Conscientiousness: 0.50
+        },
+        typicalValues: ["Power", "Security", "Achievement"],
+        education: {
+            tertiaryProbability: 0.95,
+            label: "Tertiary Education (Masters/MBA)"
+        }
     }
 };
 

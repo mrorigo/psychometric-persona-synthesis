@@ -1,9 +1,8 @@
 import { Command } from "commander";
 import { PersonaGenerator } from "./lib/PersonaGenerator.ts";
-import { BFI2_ITEMS } from "./data/bfi2_items.ts";
-import { OCCUPATIONAL_ROLES, BIG_FIVE_CORRELATIONS, DOMAIN_ORDER } from "./data/occupations.ts";
-import { cholesky, sampleMultivariateNormal } from "./lib/math.ts";
-import type { BFI2Score, RoleMetadata, Domain, FilterLevel } from "./lib/types.ts";
+import { OCCUPATIONAL_ROLES } from "./data/occupations.ts";
+import { generateHierarchicalScores } from "./api.ts";
+import type { BFI2Score, RoleMetadata, FilterLevel } from "./lib/types.ts";
 
 
 
@@ -38,7 +37,7 @@ program
     .option("-p, --perspective <type>", "Grammatical perspective (first, second, third)", "second")
     .option("-l, --role <name>", "Occupational role (General Manager, Medical Doctor, Software Developer, Nurse, Artist, Teacher, Entrepreneur, Police Officer, etc.)")
 
-    .action(async (options) => {
+    .action(async (options: any) => {
         let scores: BFI2Score = {};
         let role: RoleMetadata | undefined;
 
@@ -55,7 +54,8 @@ program
         }
 
         if (options.random) {
-            scores = generateHierarchicalScores(role);
+            const [generatedScores] = generateHierarchicalScores(role, Math.random);
+            scores = generatedScores;
             console.log(role ? `Generated hierarchical scores for ${options.role}.` : "Generated hierarchical scores.");
 
         } else if (options.scores) {
@@ -107,37 +107,3 @@ program
     });
 
 program.parse();
-
-function generateHierarchicalScores(role?: RoleMetadata): BFI2Score {
-    const mu = DOMAIN_ORDER.map(d => {
-        let mean = 3.0;
-        if (role) {
-            mean += role.offsets[d] || 0;
-        }
-        return mean;
-    });
-
-    const L = cholesky(BIG_FIVE_CORRELATIONS);
-    const traitSamples = sampleMultivariateNormal(mu, L);
-
-    const domainScores: Record<string, number> = {};
-    DOMAIN_ORDER.forEach((d, i) => {
-        domainScores[d] = Math.max(1, Math.min(5, Math.round(traitSamples[i] || 3)));
-    });
-
-    const scores: BFI2Score = {};
-    for (const item of BFI2_ITEMS) {
-        const base = domainScores[item.domain] || 3;
-        const noise = Math.floor(Math.random() * 3) - 1;
-        let score = base + noise;
-
-        score = Math.max(1, Math.min(5, score));
-
-        if (item.isReverse) {
-            score = 6 - score;
-        }
-
-        scores[item.id] = score;
-    }
-    return scores;
-}

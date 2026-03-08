@@ -18,17 +18,6 @@ export interface PersonaGenerationResult {
     decisionStyle: string;
 }
 
-function getContext(perspective: string): string {
-    const base = "### Context ###\n";
-    if (perspective === "first") {
-        return base + "I am an AI agent participating in a personality psychology study. I have been assigned the following personality traits to simulate during this session.\n";
-    } else if (perspective === "second") {
-        return base + "You are an AI agent participating in a personality psychology study. You have been assigned the following personality traits to simulate during this session.\n";
-    } else {
-        return base + "The following describes an AI agent participating in a personality psychology study. The agent has been assigned these traits to simulate.\n";
-    }
-}
-
 export function generateHierarchicalScores(role: RoleMetadata | undefined, random: () => number): [BFI2Score, Record<string, number>] {
     const mu = DOMAIN_ORDER.map(d => {
         let mean = 3.0;
@@ -93,7 +82,7 @@ export async function generatePersona(config: PersonaConfig): Promise<PersonaGen
     const perspective = config.perspective || "second";
     const filterLevel = config.filterLevel || "none";
 
-    const generator = new PersonaGenerator(getContext(perspective));
+    const generator = new PersonaGenerator("");
 
     let education: string | undefined;
     if (role) {

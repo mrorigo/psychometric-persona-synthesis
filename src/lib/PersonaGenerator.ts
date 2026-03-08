@@ -147,7 +147,6 @@ export class PersonaGenerator {
             }
 
             personalitySegment += domainSentences.join(" ") + "\n";
-
         }
 
         return this.contextBlock + "\n" + personalitySegment;
